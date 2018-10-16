@@ -9,7 +9,7 @@ function handleRequest(req, res) {
   res.end('Everything works!')
 }
 
-const server = http.createServer({}, handleRequest)
+const server = http.createServer(handleRequest)
 server.listen(PORT, function(){
   console.log('server listening on ' + PORT)
 })
