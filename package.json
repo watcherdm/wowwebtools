@@ -1,4 +1,10 @@
 {
-  "name": "wow web tools",
-  "version": "0.0.0"
+  "name": "wow-web-tools",
+  "version": "0.0.0",
+  "dependencies": {
+    "express": "^4.16.4",
+    "nodemon": "^1.18.4",
+    "passport": "^0.4.0",
+    "passport-bnet": "^2.0.0"
+  }
 }
