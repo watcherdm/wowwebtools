@@ -24,7 +24,11 @@ const PORT = parseInt(process.argv[2], 10)
 
 const app = express()
 
-app.get('/', (req, res) => {res.end('everything works')})
+app.get('/', (req, res) => {
+  const hi = `everything works ${(new Date()).getTime()}`
+  console.log(hi)
+  res.end(hi)
+})
 
 app.get('/auth/bnet',
     passport.authenticate('bnet'));
