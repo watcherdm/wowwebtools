@@ -24,6 +24,9 @@ const PORT = parseInt(process.argv[2], 10)
 
 const app = express()
 
+app.use(passport.initialize())
+app.use(passport.session())
+
 app.get('/', (req, res) => {
   const hi = `everything works ${(new Date()).getTime()}`
   console.log(hi)
