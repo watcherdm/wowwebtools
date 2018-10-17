@@ -18,7 +18,15 @@ passport.use(new BnetStrategy({
 }, function(accessToken, refreshToken, profile, done) {
   console.log(accessToken, refreshToken, profile)
   done(null, profile)
-}));
+}))
+
+passport.serializeUser(function(user, done) {
+  done(null, user);
+})
+
+passport.deserializeUser(function(user, done) {
+  done(null, user);
+})
 
 const PORT = parseInt(process.argv[2], 10)
 
