@@ -2,12 +2,14 @@
 
 const {
   BLIZZARD_API_KEY,
-  BLIZZARD_SECRET
+  BLIZZARD_SECRET,
+  PORT
 } = process.env
 
 const passport = require('passport')
 const express = require('express')
 const BnetStrategy = require('passport-bnet').Strategy
+const blizzard = require("blizzard.js").initialize({apikey: BLIZZARD_API_KEY})
 
 passport.use(new BnetStrategy({
   clientID: BLIZZARD_API_KEY,
@@ -28,8 +30,6 @@ passport.deserializeUser(function(user, done) {
   done(null, user);
 })
 
-const PORT = parseInt(process.argv[2], 10)
-
 const app = express()
 
 app.use(passport.initialize())
@@ -42,13 +42,27 @@ app.get('/', (req, res) => {
 })
 
 app.get('/auth/bnet',
-    passport.authenticate('bnet'));
+  passport.authenticate('bnet'));
  
 app.get('/auth/bnet/callback',
-    passport.authenticate('bnet', { failureRedirect: '/' }),
-    function(req, res){
-      console.log('we got through')
-      res.redirect('/');
-    })
+  passport.authenticate('bnet', { failureRedirect: '/' }),
+  function(req, res){
+    console.log('we got through')
+    res.redirect('/');
+  })
+
+app.get('/data/wow/realm/:realmSlug', ( req, res) => {
+  if (req.user === undefined) {
+    res.redirect('/auth/bnet')
+  } else {
+    console.log(req.user)
+    blizzard.data.realm({realm: req.params.realmSlug}).then(({data}) => {
+      res.send(data)
+    }).catch((err) => {
+      console.log(err.stack)
+      res.send('Something went wrong, check the server logs')
+    })    
+  }
+})
 
 app.listen(PORT, () => { console.log(`server running on ${PORT}`) })
