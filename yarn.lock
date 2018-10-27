@@ -411,10 +411,9 @@ binary-extensions@^1.0.0:
   resolved "https://registry.yarnpkg.com/binary-extensions/-/binary-extensions-1.12.0.tgz#c2d780f53d45bba8317a8902d4ceeaf3a6385b14"
   integrity sha512-DYWGk01lDcxeS/K9IHPGWfT8PsJmbXRtRd2Sx72Tnb8pcYZQFF1oSDb8hJtS1vhp212q1Rzi5dUf9+nq0o9UIg==
 
-blizzard.js@^2.3.1:
+"blizzard.js@https://github.com/webspinner/blizzard.js":
   version "2.3.1"
-  resolved "https://registry.yarnpkg.com/blizzard.js/-/blizzard.js-2.3.1.tgz#e6bc061c1a17dec19f34c260644c18f01248970a"
-  integrity sha512-cm5lORj0KhRb2yCZv7U5Dq/GWAzEo9o/4/ueVQp9nYKogj/RqxUXa7+5CoFx0VroCo4dFlK3+hQty8EMyl/QhQ==
+  resolved "https://github.com/webspinner/blizzard.js#a39979e733e25b796292809ce5c29e894c0d03ad"
   dependencies:
     axios "^0.18.0"
 
