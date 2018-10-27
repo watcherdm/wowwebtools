@@ -23,7 +23,7 @@ const getTheme = () => {
       }
     },
     typography: {
-      useNextVariant: true
+      useNextVariants: true
     }
   }
   return createMuiTheme(overwrites);
