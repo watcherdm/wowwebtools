@@ -91,11 +91,107 @@ module.exports = function(app, _blizzard) {
     },
     finisher)
 
-  app.get('/data/wow/playable-class', 
+  app.get('/data/wow/races', 
     checkToken, 
     refreshToken, 
     (req, res, next) => {
-      blizzard.data.classes({
+      blizzard.wow.data( 'character-races', {
+        namespace: 'static-us',
+        origin: BLIZZARD_REGION,
+        access_token: req.user.token
+      }).then(commonHandler(req, res, next))
+    },
+    finisher)
+
+  app.get('/data/wow/classes', 
+    checkToken, 
+    refreshToken, 
+    (req, res, next) => {
+      blizzard.wow.data('character-classes', {
+        namespace: 'static-us',
+        origin: BLIZZARD_REGION,
+        access_token: req.user.token
+      }).then(commonHandler(req, res, next))
+    },
+    finisher)
+
+  app.get('/data/wow/achievements', 
+    checkToken, 
+    refreshToken, 
+    (req, res, next) => {
+      blizzard.wow.data('character-achievements', {
+        namespace: 'static-us',
+        origin: BLIZZARD_REGION,
+        access_token: req.user.token
+      }).then(commonHandler(req, res, next))
+    },
+    finisher)
+
+  app.get('/data/wow/guild/rewards', 
+    checkToken, 
+    refreshToken, 
+    (req, res, next) => {
+      blizzard.wow.data('guild-rewards', {
+        namespace: 'static-us',
+        origin: BLIZZARD_REGION,
+        access_token: req.user.token
+      }).then(commonHandler(req, res, next))
+    },
+    finisher)
+
+  app.get('/data/wow/guild/perks', 
+    checkToken, 
+    refreshToken, 
+    (req, res, next) => {
+      blizzard.wow.data('guild-perks', {
+        namespace: 'static-us',
+        origin: BLIZZARD_REGION,
+        access_token: req.user.token
+      }).then(commonHandler(req, res, next))
+    },
+    finisher)
+
+  app.get('/data/wow/guild/achievements', 
+    checkToken, 
+    refreshToken, 
+    (req, res, next) => {
+      blizzard.wow.data('guild-achievements', {
+        namespace: 'static-us',
+        origin: BLIZZARD_REGION,
+        access_token: req.user.token
+      }).then(commonHandler(req, res, next))
+    },
+    finisher)
+
+  app.get('/data/wow/item/classes', 
+    checkToken, 
+    refreshToken, 
+    (req, res, next) => {
+      blizzard.wow.data('item-classes', {
+        namespace: 'static-us',
+        origin: BLIZZARD_REGION,
+        access_token: req.user.token
+      }).then(commonHandler(req, res, next))
+    },
+    finisher)
+
+  app.get('/data/wow/talents', 
+    checkToken, 
+    refreshToken, 
+    (req, res, next) => {
+      blizzard.wow.data('talents', {
+        namespace: 'static-us',
+        origin: BLIZZARD_REGION,
+        access_token: req.user.token
+      }).then(commonHandler(req, res, next))
+    },
+    finisher)
+
+  app.get('/data/wow/pet/types', 
+    checkToken, 
+    refreshToken, 
+    (req, res, next) => {
+      blizzard.wow.data('pet/types', {
         namespace: 'static-us',
         origin: BLIZZARD_REGION,
         access_token: req.user.token

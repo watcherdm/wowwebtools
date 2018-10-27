@@ -4,7 +4,8 @@ const {
   BLIZZARD_API_KEY,
   BLIZZARD_SECRET,
   BLIZZARD_REGION,
-  PORT
+  PORT,
+  NODE_ENV
 } = process.env
 
 const cookieParser = require('cookie-parser')
@@ -57,7 +58,7 @@ app.get('/auth/bnet',
 app.get('/auth/bnet/callback',
   passport.authenticate('bnet', { failureRedirect: '/' }),
   function(req, res){
-    res.redirect('https://www.wowwebtools.com/');
+    res.redirect('/');
   })
 
 app.get('/session', (req, res) => {  

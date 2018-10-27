@@ -1,19 +1,60 @@
+const commonHandler = (data) => {
+  console.log(data)
+}
+
 const API = {
-  realms : {
-    bloodhoof: () => {
-      return $.get('/data/wow/realm/bloodhoof')
-    }
+  bloodhoof: () => {
+    return $.get('/data/wow/realm/bloodhoof').then(commonHandler)
   },
   characters: () => {
-    return $.get('/data/wow/characters')
+    return $.get('/data/wow/characters').then(commonHandler)
   },
-  classes: () => { 
-    return $.get('/data/wow/playable-class')
+  classes: () => {
+    return $.get('/data/wow/classes').then(commonHandler)
+  },
+  races: () => {
+    return $.get('/data/wow/races').then(commonHandler)
+  },
+  achievements: () => {
+    return $.get('/data/wow/achievements').then(commonHandler)
+  },
+  guild: {
+    rewards: () => {
+      return $.get('/data/wow/guild/rewards').then(commonHandler)
+    },
+    perks: () => {
+      return $.get('/data/wow/guild/perks').then(commonHandler)
+    },
+    achievements: () => {
+      return $.get('/data/wow/guild/achievements').then(commonHandler)
+    }
+  },
+  item: {
+    classes: () => {
+      return $.get('/data/wow/item/classes').then(commonHandler)
+    }
+  },
+  talents: () => {
+    return $.get('/data/wow/talents').then(commonHandler)
   }
 }
-$('.characters').on('click', API.characters)
-$('.realm').on('click', API.realms.bloodhoof)
-$('.classes').on('click', API.classes)
+
+function generateClickable(obj, elem, namespace = '') {
+  Object.keys(obj).map(key => {
+    if (typeof obj[key] === 'function') {
+      const link = $(`<button>${namespace} ${key}</button>`)
+      link.on('click', obj[key])
+      link.appendTo(elem)
+    } else {
+      const container = $(`<div>${key}</div>`)
+      container.appendTo(elem)
+      generateClickable(obj[key], container, [namespace, key].filter(x=>x).join('.'))
+    }
+  })
+}
+
+generateClickable(API, '.tools')
+
 $.get("/session").then((session) => {
   $('.tools').show()
 }, () => {
