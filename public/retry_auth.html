@@ -1,0 +1,11 @@
+<script src="/socket.io/socket.io.js" type="text/javascript"></script>
+<script type="text/javascript">
+fetch("/auth/session").then(res => res.json()).then((session) => {
+  const socket = io()
+  socket.emit('session-confirmed', {location: location.href, session_id: session.id})
+  socket.emit('retry-auth', {location: location.href, session_id: session.id})
+  socket.on('retry-then', ({or}) => {
+    window[or]()
+  })
+})
+</script>

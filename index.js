@@ -7,65 +7,59 @@ const {
   PORT,
   NODE_ENV
 } = process.env
+console.log()
+const _PORT = parseInt(PORT, 10)
+
+var options = {
+  dotfiles: 'ignore',
+  etag: true,
+  extensions: ['htm', 'html'],
+  index: 'index.html',
+  lastModified: true,
+  maxAge: '1d',
+  setHeaders: function (res, path, stat) {
+    res.set('x-timestamp', Date.now());
+    res.header('Cache-Control', 'public, max-age=1d');
+  }
+}
 
 const cookieParser = require('cookie-parser')
 const passport = require('passport')
 const express = require('express')
 const session = require('express-session')
-const BnetStrategy = require('passport-bnet').Strategy
 const blizzard = require("blizzard.js").initialize({apikey: BLIZZARD_API_KEY, origin: BLIZZARD_REGION})
 const api = require("./routes/api")
-
-const callbackHost = (PORT === 8080) ? '' : 'https://www.wowwebtools.com'
-const callbackURL = `${callbackHost}/auth/bnet/callback` 
-
-passport.use(new BnetStrategy({
-  clientID: BLIZZARD_API_KEY,
-  clientSecret: BLIZZARD_SECRET,
-  callbackURL: "/auth/bnet/callback",
-  region: BLIZZARD_REGION,
-  scope: ['wow.profile']
-}, function(accessToken, refreshToken, profile, done) {
-  console.log(accessToken, refreshToken, profile)
-  done(null, profile)
-}))
-
-passport.serializeUser(function(user, done) {
-  done(null, user);
-})
-
-passport.deserializeUser(function(user, done) {
-  done(null, user);
-})
-
+const admin = require('./routes/admin')
+const auth = require('./routes/auth')
+const http = require('http')
+const socket = require('socket.io')
 const app = express()
 
-app.use(session({ 
-  secret: BLIZZARD_SECRET,
-  cookie: {
-    httpOnly: false
-  },
-  resave: true,
-  saveUninitialized: true
-}));
-app.use(passport.initialize())
-app.use(passport.session())
-app.use(express.static('public'))
 
-app.get('/auth/bnet',
-  passport.authenticate('bnet'));
- 
-app.get('/auth/bnet/callback',
-  passport.authenticate('bnet', { failureRedirect: '/' }),
-  function(req, res){
-    res.redirect('/');
-  })
+var server = http.Server(app)
+var io = socket(server)
+server.listen(PORT, () => { console.log(`server running on ${PORT}`) })
 
-app.get('/session', (req, res) => {  
-  const status = req.user ? 200 : 404
-  res.status(status).send(req.user)
-})
-
+auth(express, app, passport, session)
 api(app, blizzard)
+admin(app)
 
-app.listen(PORT, () => { console.log(`server running on ${PORT}`) })
+app.use('/js', express.static(__dirname + '/public/js'))
+app.use('/css', express.static(__dirname + '/public/css'))
+app.use('/img', express.static(__dirname + '/public/img'))
+app.use('/', express.static(__dirname + '/public', options))
+app.use('*', express.static(__dirname + '/public', options))
+
+io.on('connection', (socket) => {
+  console.log('Client connected: requesting session id');
+  socket.on('session-confirmed', (data) => {
+    console.log(`Client session id acquired: ${data.session_id}`)
+    socket.join(data.session_id)
+  })
+  socket.emit('confirm-session');
+  socket.on('close', () => console.log(`Client Disconnected ${socket.id}`))
+  socket.on('retry-auth', (data) => {
+    console.log(`Request for session ${data.session_id} to retry auth`)
+    io.to(data.session_id).emit('retry-then', {or: 'close'})
+  })
+})
