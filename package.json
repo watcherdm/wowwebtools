@@ -2,6 +2,7 @@
   "name": "wow-web-tools",
   "version": "0.0.0",
   "dependencies": {
+    "@material-ui/core": "^3.3.1",
     "blizzard.js": "https://github.com/webspinner/blizzard.js",
     "cookie-parser": "^1.4.3",
     "express": "^4.16.4",
@@ -12,14 +13,23 @@
     "passport-bnet": "^2.0.0",
     "pg": "^7.6.0",
     "pg-hstore": "^2.3.2",
+    "react": "^16.6.0",
     "sequelize": "^4.41.0"
   },
   "scripts": {
     "dev": "nodemon index.js",
-    "build": "yarn build:ico",
+    "build:dev": "yarn build:ico; webpack --mode development --watch",
+    "build:prod": "yarn build:ico; webpack --mode production --watch",
     "build:ico": "png-to-ico public/favicon.png > public/favicon.ico"
   },
   "devDependencies": {
-    "png-to-ico": "^2.0.1"
+    "@babel/core": "^7.1.2",
+    "@babel/preset-env": "^7.1.0",
+    "@babel/preset-react": "^7.0.0",
+    "babel-loader": "^8.0.4",
+    "png-to-ico": "^2.0.1",
+    "react-dom": "^16.6.0",
+    "webpack": "^4.23.1",
+    "webpack-cli": "^3.1.2"
   }
 }
