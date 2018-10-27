@@ -3,12 +3,23 @@
   "version": "0.0.0",
   "dependencies": {
     "blizzard.js": "^2.3.1",
+    "cookie-parser": "^1.4.3",
     "express": "^4.16.4",
+    "express-session": "^1.15.6",
+    "html5-boilerplate": "^6.1.0",
     "nodemon": "^1.18.4",
     "passport": "^0.4.0",
-    "passport-bnet": "^2.0.0"
+    "passport-bnet": "^2.0.0",
+    "pg": "^7.6.0",
+    "pg-hstore": "^2.3.2",
+    "sequelize": "^4.41.0"
   },
   "scripts": {
-  	"dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "build": "yarn build:ico",
+    "build:ico": "png-to-ico public/favicon.png > public/favicon.ico"
+  },
+  "devDependencies": {
+    "png-to-ico": "^2.0.1"
   }
 }
