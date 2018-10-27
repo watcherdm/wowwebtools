@@ -15,6 +15,8 @@ const BnetStrategy = require('passport-bnet').Strategy
 const blizzard = require("blizzard.js").initialize({apikey: BLIZZARD_API_KEY, origin: BLIZZARD_REGION})
 const api = require("./routes/api")
 
+const callbackHost = (PORT === 8080) ? '' : 'https://www.wowwebtools.com'
+const callbackURL = `${callbackHost}/auth/bnet/callback` 
 
 passport.use(new BnetStrategy({
   clientID: BLIZZARD_API_KEY,
