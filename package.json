@@ -23,7 +23,7 @@
   "scripts": {
     "dev": "nodemon index.js",
     "build:dev": "webpack --mode development --watch",
-    "build:prod": "webpack --mode production --watch",
+    "build": "build:ico & webpack --mode production",
     "build:ico": "png-to-ico public/favicon.png > public/favicon.ico"
   },
   "devDependencies": {
