@@ -26,7 +26,7 @@ class Character extends Component {
   render() {
     const {character, classes} = this.state
     const {race, gender, thumbnail, name, realm} = character
-    const renderHost = 'http://render-us.worldofwarcraft.com'
+    const renderHost = '//render-us.worldofwarcraft.com'
     const insetPath = thumbnail.replace(/avatar/, 'inset')
     const altPath = `/wow/static/images/2d/inset/${race}-${gender}.jpg`
     return <Card className={classes.card} raised={true}>
