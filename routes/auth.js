@@ -1,10 +1,14 @@
 const BnetStrategy = require('passport-bnet').Strategy
+const Sequelize = require('sequelize')
 const path = require('path')
+const cookieParser = require('cookie-parser')
+const connectSessionSequelize = require('connect-session-sequelize')
 
 const {
   BLIZZARD_API_KEY,
   BLIZZARD_SECRET,
   BLIZZARD_REGION,
+  DATABASE_URL,
   PORT,
   NODE_ENV
 } = process.env
@@ -15,6 +19,24 @@ const callbackURL = `${callbackHost}/auth/bnet/callback`
 
 module.exports = (express, app, passport, session) => {
   const auth = express.Router()
+
+  const sequelize = new Sequelize(DATABASE_URL)
+  const SequelizeStore = connectSessionSequelize(session.Store)
+ 
+  app.use(cookieParser())
+
+  const myStore = new SequelizeStore({
+    db: sequelize
+  })
+
+  app.use(session({ 
+    secret: BLIZZARD_SECRET,
+    store: myStore,
+    resave: false,
+    proxy: true
+  }));
+ 
+  myStore.sync();
 
   passport.use(new BnetStrategy({
     clientID: BLIZZARD_API_KEY,
@@ -35,14 +57,6 @@ module.exports = (express, app, passport, session) => {
     done(null, user);
   })
 
-  app.use(session({ 
-    secret: BLIZZARD_SECRET,
-    cookie: {
-      httpOnly: false
-    },
-    resave: true,
-    saveUninitialized: true
-  }));
 
   app.use(passport.initialize())
   app.use(passport.session())

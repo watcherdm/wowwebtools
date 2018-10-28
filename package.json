@@ -4,6 +4,7 @@
   "dependencies": {
     "@material-ui/core": "^3.3.1",
     "blizzard.js": "https://github.com/webspinner/blizzard.js",
+    "connect-session-sequelize": "^5.2.2",
     "cookie-parser": "^1.4.3",
     "express": "^4.16.4",
     "express-session": "^1.15.6",

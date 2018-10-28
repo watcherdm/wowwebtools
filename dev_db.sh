@@ -11,4 +11,3 @@ if [ $COMMAND == 'delete' ]; then
   echo 'DROP DATABASE wowwebtools_dev;' | psql postgres
   echo 'DROP ROLE wowwebtools;' | psql postgres
 fi
-  

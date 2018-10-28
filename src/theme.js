@@ -15,7 +15,7 @@ export default class WwtTheme extends Component {
           dark: cyan[800],
           contrastText: grey[600]
         },
-        "accent": {
+        "secondary": {
           main: purple[500],
           dark: purple[400],
           contrastText: purple[300]
