@@ -33,6 +33,7 @@ module.exports = (express, app, passport, session) => {
     secret: BLIZZARD_SECRET,
     store: myStore,
     resave: false,
+    saveUninitialized: false,
     proxy: true
   }));
  

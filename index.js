@@ -26,6 +26,7 @@ var options = {
 const cookieParser = require('cookie-parser')
 const passport = require('passport')
 const express = require('express')
+const bodyParser = require('body-parser')
 const session = require('express-session')
 const blizzard = require("blizzard.js").initialize({apikey: BLIZZARD_API_KEY, origin: BLIZZARD_REGION})
 const api = require("./routes/api")
@@ -35,7 +36,12 @@ const http = require('http')
 const socket = require('socket.io')
 const app = express()
 
+app.use(bodyParser.json({limit: '50mb'}))
 
+app.use((req, res, next) => {
+  console.log(req.method, req.url)
+  next()
+})
 var server = http.Server(app)
 var io = socket(server)
 server.listen(PORT, () => { console.log(`server running on ${PORT}`) })

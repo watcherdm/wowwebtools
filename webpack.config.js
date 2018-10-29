@@ -6,6 +6,9 @@ module.exports = {
     path: `${__dirname}/public`, 
     filename: 'js/[name].js'
   },
+  watchOptions: {
+    ignored: [`${__dirname}/public/json/*.json`, `${__dirname}/node_modules`]
+  },
   module: {
     rules: [
       {

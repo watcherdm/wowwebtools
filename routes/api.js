@@ -68,6 +68,18 @@ module.exports = function(app, blizzard) {
 
   api.use(checkToken, refreshToken, )
 
+  api.route('/realms').get(
+    checkToken,
+    refreshToken,
+    (req, res, next) => {
+      blizzard.data.realm({
+        origin: BLIZZARD_REGION,
+        access_token: req.user.token
+      }).then(commonHandler(req, res, next))
+    },
+    finisher
+  )
+
   api.route('/realm/:realmSlug').get(
     checkToken, 
     refreshToken, 

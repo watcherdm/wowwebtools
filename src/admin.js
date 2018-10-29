@@ -4,6 +4,7 @@ import Theme from './theme'
 import Character from './components/character'
 import Paper from '@material-ui/core/Paper'
 import Grid from '@material-ui/core/Grid'
+import Files from './components/files'
 
 export default class Admin extends Component {
   constructor(props) {
@@ -52,6 +53,9 @@ export default class Admin extends Component {
         container 
         spacing={24}
       >
+        <Grid item>
+          <Files/>
+        </Grid>
         {characters}
       </Grid>
     )
