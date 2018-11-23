@@ -1,13 +1,14 @@
 const express = require('express')
-
+const {Character} = require('../models')
 const {
   BLIZZARD_API_KEY,
   BLIZZARD_SECRET,
   BLIZZARD_REGION,
-  PORT
+  PORT,
+  DISCORD_URL
 } = process.env
 
-module.exports = function(app, blizzard) {
+module.exports = function(app, blizzard, sequelize) {
   const api = express.Router()
   const checkToken = (req, res, next) => {
     console.log('checking for tokens')
@@ -24,8 +25,8 @@ module.exports = function(app, blizzard) {
           console.log('Token is still valid, we will use it')
           next()
         }, (error) => {
-          console.log(error)
-          res.status(404).end('Error checking token')
+          req.token_expired = true
+          next()
         })
     } else {
       res.status(404).end('Unauthenticated to query data')
@@ -66,11 +67,9 @@ module.exports = function(app, blizzard) {
     }
   }
 
-  api.use(checkToken, refreshToken, )
+  api.use(checkToken, refreshToken)
 
   api.route('/realms').get(
-    checkToken,
-    refreshToken,
     (req, res, next) => {
       blizzard.data.realm({
         origin: BLIZZARD_REGION,
@@ -81,8 +80,6 @@ module.exports = function(app, blizzard) {
   )
 
   api.route('/realm/:realmSlug').get(
-    checkToken, 
-    refreshToken, 
     (req, res, next) => {
       blizzard.data.realm({
         origin: BLIZZARD_REGION,
@@ -94,10 +91,50 @@ module.exports = function(app, blizzard) {
 
   api.route('/characters').get(
     (req, res, next) => {
-      blizzard.account.wow({
-        origin: BLIZZARD_REGION,
-        access_token: req.user.token
-      }).then(commonHandler(req, res, next))
+      console.log(req.user.id)
+      Character.findAll({where: {bid: req.user.id}}).then(characters => {
+        res.characters = characters
+        next()
+      })
+    },
+    (req, res, next) => {
+      let request
+      if (res.characters.length !== 0) {
+        res.data = {characters: res.characters}
+        next()
+        // check for expiration and try loading again
+        // otherwise, these should be fine for now, just return them
+      } else {
+        blizzard.account.wow({
+          origin: BLIZZARD_REGION,
+          access_token: req.user.token
+        }).then(({data: {characters}}) => {
+          return sequelize.transaction((t) => {
+            return Promise.all(characters.map(character => {
+              character.bid = req.user.id
+              return Character.findOrCreate({
+                where: {
+                  bid: req.user.bid,
+                  name: character.name,
+                  realm: character.realm
+                }
+              }, {
+                defaults: character,
+                transaction: t
+              }).then(([character, created]) => {
+                if (created) {
+                  console.log(`Added character ${character.name} to DB with id: ${character.id}`)                
+                } else {
+                  console.log(`Found character ${character.name} in DB with id: ${character.id}`)
+                }
+                return character
+              }).catch(err => {console.log(err)})
+            }))
+          })
+        }).then((characters) => {
+          return {data: {characters}}
+        }).then(commonHandler(req, res, next))
+      }
     },
     finisher)
 
@@ -189,6 +226,27 @@ module.exports = function(app, blizzard) {
       }).then(commonHandler(req, res, next))
     },
     finisher)
+
+  api.route('/character/:realm/:name/:field').get((req, res, next) => {
+    const {realm, name, field} = req.params
+    blizzard.wow.character(field, {
+      access_token: req.user.token,
+      ...req.params
+    }).then(commonHandler(req, res, next))
+  }, finisher)
+
+  api.route('/guild/:realm/:name/:field').get((req, res, next) => {
+    const {realm, name, field} = req.params
+    blizzard.wow.guild(field, {
+      access_token: req.user.token,
+      ...req.params
+    }).then(commonHandler(req, res, next))
+  }, finisher)
+
+  api.route('/discord').get((req, res, next) => {
+    const {realm, guild, characters} = req.params
+    return DISCORD_URL
+  }, finisher)
 
   app.use('/api', api)
 

@@ -1,0 +1,28 @@
+{
+  "_links": {
+    "self": {
+      "href": "https://us.api.blizzard.com/data/wow/realm/undermine?namespace=dynamic-us"
+    }
+  },
+  "id": 1294,
+  "region": {
+    "key": {
+      "href": "https://us.api.blizzard.com/data/wow/region/1?namespace=dynamic-us"
+    },
+    "name": "North America",
+    "id": 1
+  },
+  "connected_realm": {
+    "href": "https://us.api.blizzard.com/data/wow/connected-realm/1174?namespace=dynamic-us"
+  },
+  "name": "Undermine",
+  "category": "United States",
+  "locale": "enUS",
+  "timezone": "America/Chicago",
+  "type": {
+    "type": "NORMAL",
+    "name": "Normal"
+  },
+  "is_tournament": false,
+  "slug": "undermine"
+}

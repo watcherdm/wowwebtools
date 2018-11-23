@@ -1,0 +1,28 @@
+{
+  "_links": {
+    "self": {
+      "href": "https://us.api.blizzard.com/data/wow/realm/ragnaros?namespace=dynamic-us"
+    }
+  },
+  "id": 1427,
+  "region": {
+    "key": {
+      "href": "https://us.api.blizzard.com/data/wow/region/1?namespace=dynamic-us"
+    },
+    "name": "North America",
+    "id": 1
+  },
+  "connected_realm": {
+    "href": "https://us.api.blizzard.com/data/wow/connected-realm/1427?namespace=dynamic-us"
+  },
+  "name": "Ragnaros",
+  "category": "Latin America",
+  "locale": "esMX",
+  "timezone": "America/Chicago",
+  "type": {
+    "type": "NORMAL",
+    "name": "Normal"
+  },
+  "is_tournament": false,
+  "slug": "ragnaros"
+}

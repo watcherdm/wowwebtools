@@ -1,0 +1,28 @@
+{
+  "_links": {
+    "self": {
+      "href": "https://us.api.blizzard.com/data/wow/realm/nemesis?namespace=dynamic-us"
+    }
+  },
+  "id": 3208,
+  "region": {
+    "key": {
+      "href": "https://us.api.blizzard.com/data/wow/region/1?namespace=dynamic-us"
+    },
+    "name": "North America",
+    "id": 1
+  },
+  "connected_realm": {
+    "href": "https://us.api.blizzard.com/data/wow/connected-realm/3208?namespace=dynamic-us"
+  },
+  "name": "Nemesis",
+  "category": "Brazil",
+  "locale": "ptBR",
+  "timezone": "America/Sao_Paulo",
+  "type": {
+    "type": "NORMAL",
+    "name": "Normal"
+  },
+  "is_tournament": false,
+  "slug": "nemesis"
+}

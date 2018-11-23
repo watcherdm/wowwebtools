@@ -1,19 +1,27 @@
 import React, {Component} from 'react'
 import Button from '@material-ui/core/Button'
-import Paper from '@material-ui/core/Paper'
-import Typography from '@material-ui/core/Typography'
 import { withStyles } from '@material-ui/core/styles'
+import List from '@material-ui/core/List'
+import ListItem from '@material-ui/core/ListItem'
+import ListItemIcon from '@material-ui/core/ListItemIcon'
+import ListItemText from '@material-ui/core/ListItemText'
 
-const styles = {
-  main: '100vw'
-}
+const styles = theme => ({
+  root: {
+    width: '50%',
+    maxWidth: 360,
+    backgroundColor: theme.palette.background.paper,
+  },
+});
 
 class Files extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      files: []
+      files: [],
+      classes: props.classes
     }
+    this.loadData = this.loadData.bind(this)
   }
 
   componentDidMount() {
@@ -81,18 +89,18 @@ class Files extends Component {
           petTypes
         }
 
-        Object.keys(data).map(key => {
-          fetch('/admin/write', {
-            method: 'POST',
-            headers: {
-              'Accept': 'application/json',
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              filename: key,
-              contents: data[key]
+        Object.keys(data).map(prop => {
+          const records = data[prop]
+          this.writeJSONFile({filename: prop, contents: records })
+            .then(() => {
+              if (prop === 'realms') {
+                records.forEach(({slug}, i) => {
+                  fetch(`/api/realm/${slug}`).then(r => r.json()).then(obj => {
+                    this.writeJSONFile({filename:`${prop}-${slug}`, contents: obj})
+                  })
+                })                
+              }
             })
-          })
         })
       })
       .catch((err) => {
@@ -100,10 +108,38 @@ class Files extends Component {
       })
   }
 
-  render() {
+  writeJSONFile({filename, contents}) {   
+    return fetch('/admin/write', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        filename,
+        contents
+      })
+    })
+  }
+
+  renderFiles() {
     const {files} = this.state
-    const message = (files.length === 0) ? <Button onClick={this.loadData}>Load Data</Button> : <Paper><Typography>{`${files.length} / 10 files loaded`}</Typography><Button>Reload Data</Button></Paper>
-    return <div>{message}</div>
+    return files.map((file, i) => {
+      return (<ListItem key={file} button>
+                <ListItemText inset primary={file.replace(/\.\/public\/json\/([\w\-]*)\.json/, '$1')} />
+              </ListItem>)
+    })
+  }
+
+  render() {
+    const {files, classes} = this.state
+    const message = (files.length === 0) ? 'Load Data' : 'Reload Data'
+    return <div className={classes.root}>
+      <Button onClick={this.loadData}>{message}</Button>
+      <List component="nav">
+        {this.renderFiles()}
+      </List>
+    </div>
   }
 }
 
