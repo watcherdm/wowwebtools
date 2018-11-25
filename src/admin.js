@@ -16,10 +16,10 @@ export default class Admin extends Component {
         spacing={8}
       >
         <Grid item>
-          <Files session={session}/>
+          <Characters session={session} realm="Bloodhoof" guild="Booty Bangers Union" sortBy="level"/>
         </Grid>
         <Grid item>
-          <Characters session={session} realm="Bloodhoof" guild="Booty Bangers Union" sortBy="level"/>
+          <Files session={session}/>
         </Grid>
       </Grid>
     )

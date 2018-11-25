@@ -1,6 +1,7 @@
 import React, {Component} from 'react'
 import Character from './character'
 import Grid from '@material-ui/core/Grid'
+import Button from '@material-ui/core/Button'
 
 export default class Characters extends Component {
   constructor(props) {
@@ -14,8 +15,11 @@ export default class Characters extends Component {
       realm,
       sortBy
     }
+    this.getCharacterData = this.getCharacterData.bind(this)
+    this.hardReload = this.hardReload.bind(this)
   }
-  componentDidMount() {
+
+  getCharacterData(refresh=false) {
     const {
       session,
       request, 
@@ -28,12 +32,17 @@ export default class Characters extends Component {
     if (request) {
       request.abort()
     }
-    if ( reload || (characters || []).length === 0 ) {
+    if ( refresh || reload || (characters || []).length === 0 ) {
       const new_request = new AbortController()
+      const {protocol, host} = window.location
+      const url = new URL('/api/characters', `${protocol}//${host}`)
+      if (refresh) {
+        url.searchParams.append('refresh', 1)
+      }
       this.setState({
         request: new_request
       })
-      fetch('/api/characters', {
+      fetch(url, {
         signal: new_request.signal
       })
         .then(res => res.json())
@@ -49,6 +58,7 @@ export default class Characters extends Component {
         })
     }
   }
+
   componentWillUnmount() {
     const {request} = this.state
     request.abort()
@@ -69,6 +79,22 @@ export default class Characters extends Component {
     })
   }
 
+  componentDidMount() {
+    this.getCharacterData()
+  }
+
+  hardReload() {
+    this.getCharacterData(true)
+  }
+
+  componentWillReceiveProps(newProps) {
+    if (this.state.session !== newProps.session){
+      this.setState({
+        session: newProps.session
+      }, this.getCharacterData)
+    }
+  }
+
   renderCharacters() {
     return this.getRenderCharacters().map((character, i) => {
       return (<Grid item key={`characters-${i}`}>
@@ -84,6 +110,9 @@ export default class Characters extends Component {
         container 
         spacing={8}
       >
+        <Grid item>
+          <Button onClick={() => this.getCharacterData(true)}>Load From Blizzard</Button>
+        </Grid>
         {characters}
       </Grid>
     )

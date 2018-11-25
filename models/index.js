@@ -68,7 +68,8 @@ const Character = sequelize.define('character', {
   "spec": _JSON,
   "guild": STRING,
   "guildRealm": STRING,
-  "lastModified": DATE
+  "lastModified": DATE,
+  "updatedDate": DATE,
 })
 
 Character.belongsTo(User)

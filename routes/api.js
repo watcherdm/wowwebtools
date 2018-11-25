@@ -91,11 +91,15 @@ module.exports = function(app, blizzard, sequelize) {
 
   api.route('/characters').get(
     (req, res, next) => {
-      console.log(req.user.id)
-      Character.findAll({where: {bid: req.user.id}}).then(characters => {
-        res.characters = characters
+      if (req.user.bid == null || req.query.refresh) {
+        res.characters = []
         next()
-      })
+      } else {
+        Character.findAll({where: {bid: req.user.bid}}).then(characters => {
+          res.characters = characters
+          next()
+        })        
+      }
     },
     (req, res, next) => {
       let request
@@ -105,26 +109,33 @@ module.exports = function(app, blizzard, sequelize) {
         // check for expiration and try loading again
         // otherwise, these should be fine for now, just return them
       } else {
+        console.log('requesting account info from Blizzard')
         blizzard.account.wow({
           origin: BLIZZARD_REGION,
           access_token: req.user.token
         }).then(({data: {characters}}) => {
+          console.log(`got ${characters.length} characters from blizzard`)
           return sequelize.transaction((t) => {
-            return Promise.all(characters.map(character => {
-              character.bid = req.user.id
+            return Promise.all(characters.map(_character => {
+              _character.bid = req.user.bid
               return Character.findOrCreate({
                 where: {
                   bid: req.user.bid,
-                  name: character.name,
-                  realm: character.realm
-                }
-              }, {
-                defaults: character,
+                  name: _character.name,
+                  realm: _character.realm
+                },
+                defaults: _character,
                 transaction: t
               }).then(([character, created]) => {
                 if (created) {
                   console.log(`Added character ${character.name} to DB with id: ${character.id}`)                
                 } else {
+                  // probably need to update the character at this point
+                  if (_character.lastUpdated !== character.lastUpdated) {
+                    console.log(`The remote character has been updated ${_character.lastUpdated} / ${character.lastUpdated}.`, character, _character)
+                  } else {
+                    console.log('The remote character has not changed since last sync')
+                  }
                   console.log(`Found character ${character.name} in DB with id: ${character.id}`)
                 }
                 return character
@@ -197,6 +208,29 @@ module.exports = function(app, blizzard, sequelize) {
     },
     finisher)
 
+  api.route('/item/:itemId').get(
+    (req, res, next) => {
+      blizzard.wow.item({
+        id: req.params.itemId,
+        namespace: 'dynamic-us',
+        origin: BLIZZARD_REGION,
+        access_token: req.user.token
+      }).then(commonHandler(req, res, next))
+    },
+    finisher)
+
+  api.route('/recipe/:recipeId').get(
+    (req, res, next) => {
+      blizzard.wow.recipe({
+        id: req.params.recipeId,
+        namespace: 'dynamic-us',
+        origin: BLIZZARD_REGION,
+        access_token: req.user.token
+      }).then(commonHandler(req, res, next))
+    },
+    finisher)
+
+
   api.route('/item/classes').get(
     (req, res, next) => {
       blizzard.wow.data('item-classes', {
@@ -229,10 +263,15 @@ module.exports = function(app, blizzard, sequelize) {
 
   api.route('/character/:realm/:name/:field').get((req, res, next) => {
     const {realm, name, field} = req.params
+    console.log(`handling request to get ${name}:${realm} data ${field}`)
     blizzard.wow.character(field, {
       access_token: req.user.token,
       ...req.params
-    }).then(commonHandler(req, res, next))
+    }).then(commonHandler(req, res, next)).catch(err => {
+      console.error(err.response.status)
+      res.status(500)
+      res.json({err: err.reponse.data})
+    })
   }, finisher)
 
   api.route('/guild/:realm/:name/:field').get((req, res, next) => {

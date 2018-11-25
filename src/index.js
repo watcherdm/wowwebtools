@@ -22,6 +22,7 @@ class App extends Component {
     this.changeAuth = this.changeAuth.bind(this)
     this.socket = io()
     this.socket.on('retry-then', ({or}) => {
+      console.log('retry request received in client window', or)
       this.componentDidMount().then(() => {
         this.setState({
           showBlizzardAuth: false
@@ -41,7 +42,9 @@ class App extends Component {
   }
 
   componentDidMount() {
-    return fetch("/auth/session").then((res) => res.json()).then((session) => this.setState({session}))
+    return fetch("/auth/session").then((res) => res.json()).then((session) => {
+      this.setState({session})
+    })
   }
 
   changeAuth() {
