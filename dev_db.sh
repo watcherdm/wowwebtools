@@ -8,6 +8,6 @@ if [ $COMMAND == 'create' ]; then
 fi
 
 if [ $COMMAND == 'delete' ]; then
-  echo 'DROP DATABASE wowwebtools_dev;' | psql postgres
+  echo 'DROP DATABASE wowwebtools_dev;' | psql postgres postgres 
   echo 'DROP ROLE wowwebtools;' | psql postgres
 fi

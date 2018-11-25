@@ -1,13 +1,14 @@
 const express = require('express')
-
+const {Character} = require('../models')
 const {
   BLIZZARD_API_KEY,
   BLIZZARD_SECRET,
   BLIZZARD_REGION,
-  PORT
+  PORT,
+  DISCORD_URL
 } = process.env
 
-module.exports = function(app, blizzard) {
+module.exports = function(app, blizzard, sequelize) {
   const api = express.Router()
   const checkToken = (req, res, next) => {
     console.log('checking for tokens')
@@ -24,8 +25,8 @@ module.exports = function(app, blizzard) {
           console.log('Token is still valid, we will use it')
           next()
         }, (error) => {
-          console.log(error)
-          res.status(404).end('Error checking token')
+          req.token_expired = true
+          next()
         })
     } else {
       res.status(404).end('Unauthenticated to query data')
@@ -66,11 +67,9 @@ module.exports = function(app, blizzard) {
     }
   }
 
-  api.use(checkToken, refreshToken, )
+  api.use(checkToken, refreshToken)
 
   api.route('/realms').get(
-    checkToken,
-    refreshToken,
     (req, res, next) => {
       blizzard.data.realm({
         origin: BLIZZARD_REGION,
@@ -81,8 +80,6 @@ module.exports = function(app, blizzard) {
   )
 
   api.route('/realm/:realmSlug').get(
-    checkToken, 
-    refreshToken, 
     (req, res, next) => {
       blizzard.data.realm({
         origin: BLIZZARD_REGION,
@@ -94,10 +91,61 @@ module.exports = function(app, blizzard) {
 
   api.route('/characters').get(
     (req, res, next) => {
-      blizzard.account.wow({
-        origin: BLIZZARD_REGION,
-        access_token: req.user.token
-      }).then(commonHandler(req, res, next))
+      if (req.user.bid == null || req.query.refresh) {
+        res.characters = []
+        next()
+      } else {
+        Character.findAll({where: {bid: req.user.bid}}).then(characters => {
+          res.characters = characters
+          next()
+        })        
+      }
+    },
+    (req, res, next) => {
+      let request
+      if (res.characters.length !== 0) {
+        res.data = {characters: res.characters}
+        next()
+        // check for expiration and try loading again
+        // otherwise, these should be fine for now, just return them
+      } else {
+        console.log('requesting account info from Blizzard')
+        blizzard.account.wow({
+          origin: BLIZZARD_REGION,
+          access_token: req.user.token
+        }).then(({data: {characters}}) => {
+          console.log(`got ${characters.length} characters from blizzard`)
+          return sequelize.transaction((t) => {
+            return Promise.all(characters.map(_character => {
+              _character.bid = req.user.bid
+              return Character.findOrCreate({
+                where: {
+                  bid: req.user.bid,
+                  name: _character.name,
+                  realm: _character.realm
+                },
+                defaults: _character,
+                transaction: t
+              }).then(([character, created]) => {
+                if (created) {
+                  console.log(`Added character ${character.name} to DB with id: ${character.id}`)                
+                } else {
+                  // probably need to update the character at this point
+                  if (_character.lastUpdated !== character.lastUpdated) {
+                    console.log(`The remote character has been updated ${_character.lastUpdated} / ${character.lastUpdated}.`, character, _character)
+                  } else {
+                    console.log('The remote character has not changed since last sync')
+                  }
+                  console.log(`Found character ${character.name} in DB with id: ${character.id}`)
+                }
+                return character
+              }).catch(err => {console.log(err)})
+            }))
+          })
+        }).then((characters) => {
+          return {data: {characters}}
+        }).then(commonHandler(req, res, next))
+      }
     },
     finisher)
 
@@ -160,6 +208,29 @@ module.exports = function(app, blizzard) {
     },
     finisher)
 
+  api.route('/item/:itemId').get(
+    (req, res, next) => {
+      blizzard.wow.item({
+        id: req.params.itemId,
+        namespace: 'dynamic-us',
+        origin: BLIZZARD_REGION,
+        access_token: req.user.token
+      }).then(commonHandler(req, res, next))
+    },
+    finisher)
+
+  api.route('/recipe/:recipeId').get(
+    (req, res, next) => {
+      blizzard.wow.recipe({
+        id: req.params.recipeId,
+        namespace: 'dynamic-us',
+        origin: BLIZZARD_REGION,
+        access_token: req.user.token
+      }).then(commonHandler(req, res, next))
+    },
+    finisher)
+
+
   api.route('/item/classes').get(
     (req, res, next) => {
       blizzard.wow.data('item-classes', {
@@ -189,6 +260,32 @@ module.exports = function(app, blizzard) {
       }).then(commonHandler(req, res, next))
     },
     finisher)
+
+  api.route('/character/:realm/:name/:field').get((req, res, next) => {
+    const {realm, name, field} = req.params
+    console.log(`handling request to get ${name}:${realm} data ${field}`)
+    blizzard.wow.character(field, {
+      access_token: req.user.token,
+      ...req.params
+    }).then(commonHandler(req, res, next)).catch(err => {
+      console.error(err.response.status)
+      res.status(500)
+      res.json({err: err.reponse.data})
+    })
+  }, finisher)
+
+  api.route('/guild/:realm/:name/:field').get((req, res, next) => {
+    const {realm, name, field} = req.params
+    blizzard.wow.guild(field, {
+      access_token: req.user.token,
+      ...req.params
+    }).then(commonHandler(req, res, next))
+  }, finisher)
+
+  api.route('/discord').get((req, res, next) => {
+    const {realm, guild, characters} = req.params
+    return DISCORD_URL
+  }, finisher)
 
   app.use('/api', api)
 

@@ -1,0 +1,28 @@
+{
+  "_links": {
+    "self": {
+      "href": "https://us.api.blizzard.com/data/wow/realm/shadow-council?namespace=dynamic-us"
+    }
+  },
+  "id": 125,
+  "region": {
+    "key": {
+      "href": "https://us.api.blizzard.com/data/wow/region/1?namespace=dynamic-us"
+    },
+    "name": "North America",
+    "id": 1
+  },
+  "connected_realm": {
+    "href": "https://us.api.blizzard.com/data/wow/connected-realm/125?namespace=dynamic-us"
+  },
+  "name": "Shadow Council",
+  "category": "United States",
+  "locale": "enUS",
+  "timezone": "America/Denver",
+  "type": {
+    "type": "RP",
+    "name": "Roleplaying"
+  },
+  "is_tournament": false,
+  "slug": "shadow-council"
+}

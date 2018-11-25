@@ -1,0 +1,28 @@
+{
+  "_links": {
+    "self": {
+      "href": "https://us.api.blizzard.com/data/wow/realm/the-scryers?namespace=dynamic-us"
+    }
+  },
+  "id": 1570,
+  "region": {
+    "key": {
+      "href": "https://us.api.blizzard.com/data/wow/region/1?namespace=dynamic-us"
+    },
+    "name": "North America",
+    "id": 1
+  },
+  "connected_realm": {
+    "href": "https://us.api.blizzard.com/data/wow/connected-realm/75?namespace=dynamic-us"
+  },
+  "name": "The Scryers",
+  "category": "United States",
+  "locale": "enUS",
+  "timezone": "America/New_York",
+  "type": {
+    "type": "RP",
+    "name": "Roleplaying"
+  },
+  "is_tournament": false,
+  "slug": "the-scryers"
+}

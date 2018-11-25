@@ -4,6 +4,7 @@ const {
   BLIZZARD_API_KEY,
   BLIZZARD_SECRET,
   BLIZZARD_REGION,
+  DATABASE_URL,
   PORT,
   NODE_ENV
 } = process.env
@@ -22,6 +23,8 @@ var options = {
     res.header('Cache-Control', 'public, max-age=1d');
   }
 }
+const Sequelize = require('sequelize')
+const sequelize = new Sequelize(DATABASE_URL, {})
 
 const cookieParser = require('cookie-parser')
 const passport = require('passport')
@@ -46,8 +49,8 @@ var server = http.Server(app)
 var io = socket(server)
 server.listen(PORT, () => { console.log(`server running on ${PORT}`) })
 
-auth(express, app, passport, session)
-api(app, blizzard)
+auth(express, app, passport, session, sequelize)
+api(app, blizzard, sequelize)
 admin(app)
 
 app.use('/js', express.static(__dirname + '/public/js'))

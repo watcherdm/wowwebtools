@@ -1,8 +1,8 @@
 const BnetStrategy = require('passport-bnet').Strategy
-const Sequelize = require('sequelize')
 const path = require('path')
 const cookieParser = require('cookie-parser')
-const connectSessionSequelize = require('connect-session-sequelize')
+const expressSessionSequelize = require('express-session-sequelize')
+const {User, Session} = require('../models')
 
 const {
   BLIZZARD_API_KEY,
@@ -17,11 +17,10 @@ const callbackHost = (PORT === 8080) ? '' : 'https://www.wowwebtools.com'
 const callbackURL = `${callbackHost}/auth/bnet/callback` 
 
 
-module.exports = (express, app, passport, session) => {
+module.exports = (express, app, passport, session, sequelize) => {
   const auth = express.Router()
 
-  const sequelize = new Sequelize(DATABASE_URL)
-  const SequelizeStore = connectSessionSequelize(session.Store)
+  const SequelizeStore = expressSessionSequelize(session.Store)
  
   app.use(cookieParser())
 
@@ -37,8 +36,6 @@ module.exports = (express, app, passport, session) => {
     proxy: true
   }));
  
-  myStore.sync();
-
   passport.use(new BnetStrategy({
     clientID: BLIZZARD_API_KEY,
     clientSecret: BLIZZARD_SECRET,
@@ -46,9 +43,14 @@ module.exports = (express, app, passport, session) => {
     region: BLIZZARD_REGION,
     scope: ['wow.profile']
   }, function(accessToken, refreshToken, profile, done) {
-    console.log(accessToken, refreshToken, profile)
-    done(null, profile)
+    const bid = profile.id
+    delete profile.id
+    result = {...profile, bid}
+    User.findOrCreate({where: {bid}, defaults: result})
+    done(null, result)
   }))
+
+  sequelize.sync()
 
   passport.serializeUser(function(user, done) {
     done(null, user);

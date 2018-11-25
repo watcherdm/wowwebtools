@@ -29,7 +29,7 @@ const {
   UUIDV1,
   UUIDV4,
   HSTORE,
-  JSON,
+  JSON: _JSON,
   JSONB,
   VIRTUAL,
   ARRAY,
@@ -46,8 +46,56 @@ const {
   MACADDR
 } = Sequelize
 
-sequelize.define('BlizzardUser', {
-	sub: STRING,
-	id: INTEGER,
-	battletag: STRING
+const User = sequelize.define('user', {
+  battletag: STRING,
+  bid: INTEGER,
+  provider: STRING,
+  sub: STRING,
+  token: STRING
 })
+
+const Character = sequelize.define('character', {
+  "bid": INTEGER,
+  "name": STRING,
+  "realm": STRING,
+  "battlegroup": STRING,
+  "class": INTEGER,
+  "race": INTEGER,
+  "gender": INTEGER,
+  "level": INTEGER,
+  "achievementPoints": INTEGER,
+  "thumbnail": STRING,
+  "spec": _JSON,
+  "guild": STRING,
+  "guildRealm": STRING,
+  "lastModified": DATE,
+  "updatedDate": DATE,
+})
+
+Character.belongsTo(User)
+
+const Session = sequelize.define('Sessions', {
+  session_id: {
+    type: STRING,
+    primaryKey: true
+  },
+  expires: {
+    type: DATE
+  },
+  data: {
+    type: STRING(50000)
+  }
+},
+{
+  tableName: 'sessions'
+})
+
+User.belongsTo(Session)
+
+sequelize.sync()
+
+module.exports = {
+  Character,
+  User,
+  Session
+}

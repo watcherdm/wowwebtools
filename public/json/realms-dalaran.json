@@ -1,0 +1,28 @@
+{
+  "_links": {
+    "self": {
+      "href": "https://us.api.blizzard.com/data/wow/realm/dalaran?namespace=dynamic-us"
+    }
+  },
+  "id": 66,
+  "region": {
+    "key": {
+      "href": "https://us.api.blizzard.com/data/wow/region/1?namespace=dynamic-us"
+    },
+    "name": "North America",
+    "id": 1
+  },
+  "connected_realm": {
+    "href": "https://us.api.blizzard.com/data/wow/connected-realm/3683?namespace=dynamic-us"
+  },
+  "name": "Dalaran",
+  "category": "United States",
+  "locale": "enUS",
+  "timezone": "America/New_York",
+  "type": {
+    "type": "NORMAL",
+    "name": "Normal"
+  },
+  "is_tournament": false,
+  "slug": "dalaran"
+}

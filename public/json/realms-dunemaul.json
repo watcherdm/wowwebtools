@@ -1,0 +1,28 @@
+{
+  "_links": {
+    "self": {
+      "href": "https://us.api.blizzard.com/data/wow/realm/dunemaul?namespace=dynamic-us"
+    }
+  },
+  "id": 111,
+  "region": {
+    "key": {
+      "href": "https://us.api.blizzard.com/data/wow/region/1?namespace=dynamic-us"
+    },
+    "name": "North America",
+    "id": 1
+  },
+  "connected_realm": {
+    "href": "https://us.api.blizzard.com/data/wow/connected-realm/119?namespace=dynamic-us"
+  },
+  "name": "Dunemaul",
+  "category": "United States",
+  "locale": "enUS",
+  "timezone": "America/Denver",
+  "type": {
+    "type": "NORMAL",
+    "name": "Normal"
+  },
+  "is_tournament": false,
+  "slug": "dunemaul"
+}

@@ -4,13 +4,16 @@ import { BrowserRouter as Router, Route, Link } from "react-router-dom"
 import AppBar from '@material-ui/core/AppBar'
 import Switch from '@material-ui/core/Switch'
 import Dialog from '@material-ui/core/Dialog'
+import Drawer from '@material-ui/core/Drawer'
 import Avatar from '@material-ui/core/Avatar'
+import Characters from './components/characters'
 import Toolbar from '@material-ui/core/Toolbar'
 import Grid from '@material-ui/core/Grid'
 import Button from '@material-ui/core/Button'
 import Typography from '@material-ui/core/Typography'
 import Theme from './theme'
 import Admin from './admin'
+import Main from './main'
 
 class App extends Component {
   constructor(props) {
@@ -19,6 +22,7 @@ class App extends Component {
     this.changeAuth = this.changeAuth.bind(this)
     this.socket = io()
     this.socket.on('retry-then', ({or}) => {
+      console.log('retry request received in client window', or)
       this.componentDidMount().then(() => {
         this.setState({
           showBlizzardAuth: false
@@ -38,7 +42,9 @@ class App extends Component {
   }
 
   componentDidMount() {
-    return fetch("/auth/session").then((res) => res.json()).then((session) => this.setState({session}))
+    return fetch("/auth/session").then((res) => res.json()).then((session) => {
+      this.setState({session})
+    })
   }
 
   changeAuth() {
@@ -51,6 +57,14 @@ class App extends Component {
         showBlizzardAuth: true
       })
     }
+  }
+
+  selectCharacter() {
+    this.setState({
+      selectCharacter: !!this.state.selectCharacter
+    })    
+  }
+  toggleDrawer(anchor, show) {
   }
 
   render() {
@@ -68,7 +82,7 @@ class App extends Component {
               spacing={24}
             >
               <Grid item>
-                <Typography type="title" color="inherit">
+                <Typography variant="h4" color="primary">
                   Booty Bangers Union
                 </Typography>
               </Grid>
@@ -79,11 +93,22 @@ class App extends Component {
                 </Button>
               </Grid>
               <Grid item>
-                <Button variant='contained' color="primary">
+                <Button disabled={!session.user} variant='contained' color="primary">
                   <Link to="/admin">Admin</Link>
                 </Button>
               </Grid>
               <Grid item>
+                <Drawer open={this.state.selectCharacter} onClose={this.selectCharacter}>
+                  <div
+                    tabIndex={0}
+                    role="button"
+                    onClick={this.selectCharacter}
+                    onKeyDown={this.selectCharacter}
+                  >
+                    <Characters session={session} guild='Booty Bangers Union' realm='Bloodhoof'/>
+                  </div>
+                </Drawer>
+
                 <Switch 
                   checked={!!session.user} 
                   onChange={this.changeAuth}/>
@@ -91,8 +116,8 @@ class App extends Component {
             </Grid>
           </Toolbar>
         </AppBar>
-        <Route path="/" exact component={() => <div/>} />
-        <Route path="/admin" exact component={Admin} />
+        <Route path="/" exact component={Main} />
+        <Route path="/admin" render={(props) => <Admin {...props} session={session}/> } />
       </Theme>
     </Router>
   }

@@ -1,0 +1,28 @@
+{
+  "_links": {
+    "self": {
+      "href": "https://us.api.blizzard.com/data/wow/realm/kul-tiras?namespace=dynamic-us"
+    }
+  },
+  "id": 1147,
+  "region": {
+    "key": {
+      "href": "https://us.api.blizzard.com/data/wow/region/1?namespace=dynamic-us"
+    },
+    "name": "North America",
+    "id": 1
+  },
+  "connected_realm": {
+    "href": "https://us.api.blizzard.com/data/wow/connected-realm/1147?namespace=dynamic-us"
+  },
+  "name": "Kul Tiras",
+  "category": "United States",
+  "locale": "enUS",
+  "timezone": "America/Chicago",
+  "type": {
+    "type": "NORMAL",
+    "name": "Normal"
+  },
+  "is_tournament": false,
+  "slug": "kul-tiras"
+}

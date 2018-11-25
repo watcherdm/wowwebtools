@@ -1,0 +1,28 @@
+{
+  "_links": {
+    "self": {
+      "href": "https://us.api.blizzard.com/data/wow/realm/eldrethalas?namespace=dynamic-us"
+    }
+  },
+  "id": 123,
+  "region": {
+    "key": {
+      "href": "https://us.api.blizzard.com/data/wow/region/1?namespace=dynamic-us"
+    },
+    "name": "North America",
+    "id": 1
+  },
+  "connected_realm": {
+    "href": "https://us.api.blizzard.com/data/wow/connected-realm/123?namespace=dynamic-us"
+  },
+  "name": "Eldre'Thalas",
+  "category": "United States",
+  "locale": "enUS",
+  "timezone": "America/New_York",
+  "type": {
+    "type": "NORMAL",
+    "name": "Normal"
+  },
+  "is_tournament": false,
+  "slug": "eldrethalas"
+}
